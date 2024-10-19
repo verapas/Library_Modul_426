@@ -1,8 +1,11 @@
-package ch.csbe.bibliotheksapp_modul426.resources.entities.serviceLayer;
+package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
 
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Book;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Loan;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.User;
+import ch.csbe.bibliotheksapp_modul426.resources.repository.BookRepository;
+import ch.csbe.bibliotheksapp_modul426.resources.repository.LoanRepository;
+import ch.csbe.bibliotheksapp_modul426.resources.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

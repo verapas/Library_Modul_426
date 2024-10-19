@@ -1,36 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bibliothek</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>
-  <h1>Bibliotheksverwaltung</h1>
-  <nav>
-    <ul>
-      <li><a href="#home">Start</a></li>
-      <li><a href="#books">Bücher</a></li>
-      <li><a href="#login">Anmelden</a></li>
-    </ul>
-  </nav>
-</header>
 
 <main>
   <section id="home">
     <h2>Willkommen in der Bibliothek</h2>
   </section>
-  <section id="books">
-    <h2>Bücherübersicht</h2>
-      <tbody>
-      <!-- Hier kannst du Buchdaten hinzufügen -->
-      </tbody>
-    </table>
-  </section>
 
   <section id="login">
     <h2>Anmeldung</h2>
-    <!-- Hier das Anmeldeformular -->
+    <!-- Anmeldeformular -->
+    <div class="login-container">
+      <form action="/login" method="POST">
+        <div class="input-group">
+          <label for="mail">E-Mail:</label>
+          <input type="text" id="mail" name="mail" required>
+        </div>
+        <div class="input-group">
+          <label for="password">Passwort:</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Anmelden</button>
+      </form>
+    </div>
   </section>
 </main>
 
@@ -38,6 +36,6 @@
   <p>&copy; 2024 Bibliotheksverwaltung</p>
 </footer>
 
-<script src="js/script.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

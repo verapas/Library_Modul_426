@@ -1,4 +1,4 @@
-package ch.csbe.bibliotheksapp_modul426.resources.entities.serviceLayer;
+package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
 
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Book;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -11,8 +11,6 @@ public class Reminder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int loanId; // Fremdschlüssel
-
     private boolean emailSent;
 
     // Mehrere reminders können zu einer Ausleihe gehören

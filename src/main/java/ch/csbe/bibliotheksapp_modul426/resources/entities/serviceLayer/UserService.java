@@ -1,4 +1,4 @@
-package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
+package ch.csbe.bibliotheksapp_modul426.resources.entities.serviceLayer;
 
 import ch.csbe.bibliotheksapp_modul426.resources.entities.User;
 import ch.csbe.bibliotheksapp_modul426.resources.repository.UserRepository;

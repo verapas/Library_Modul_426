@@ -21,11 +21,11 @@ public class Book {
 
     private boolean available;
 
-    private Integer borrowedBy; // Nullable, kann die ID des Benutzers enthalten
-
-    private String borrowedDate; // FORMAT: YYYY-MM-DD
-
-    private String returnDate; // FORMAT: YYYY-MM-DD
+//    private Integer borrowedBy; // Nullable, kann die ID des Benutzers enthalten
+//
+//    private String borrowedDate; // FORMAT: YYYY-MM-DD
+//
+//    private String returnDate; // FORMAT: YYYY-MM-DD
 
     // Ein Buch kann in mehreren Ausleihen vorkommen
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)

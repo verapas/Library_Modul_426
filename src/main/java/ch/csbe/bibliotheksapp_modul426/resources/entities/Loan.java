@@ -13,10 +13,6 @@ public class Loan {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int userId; // Fremdschlüssel
-
-    private int bookId; // Fremdschlüssel
-
     private String loanDate; // FORMAT: YYYY-MM-DD
 
     private String returnDate; // FORMAT: YYYY-MM-DD

@@ -5,48 +5,48 @@ import ch.csbe.bibliotheksapp_modul426.resources.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
-    // Methode zum Erstellen eines neuen Benutzers
-    public User createUser(User user) {
-        // Logik zum Speichern eines neuen Benutzers
-        return userRepository.save(user);
+    // Alle Benutzer abrufen
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
-    // Methode zum Abrufen eines Benutzers per ID
-    public User getUserById(int id) {
+    // Benutzer nach ID finden
+    public User findById(int id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElse(null);  // Gibt null zurück, wenn der Benutzer nicht gefunden wird
     }
 
-    // Methode zum Abrufen eines Benutzers per E-Mail (z. B. für Login-Funktion)
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    // Methode zum Erstellen eines neuen Benutzers
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     // Methode zum Aktualisieren eines Benutzers
-    public User updateUser(int id, User userDetails) {
+    public User update(int id, User userDetails) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setName(userDetails.getName());
-        user.setEmail(userDetails.getEmail());
-        user.setPassword(userDetails.getPassword());
-        user.setRole(userDetails.getRole());
-
-        return userRepository.save(user);
+                .orElse(null);  // Benutzer suchen oder null, wenn nicht gefunden
+        if (user != null) {
+            user.setName(userDetails.getName());
+            user.setEmail(userDetails.getEmail());
+            user.setPassword(userDetails.getPassword());
+            user.setRole(userDetails.getRole());
+            return userRepository.save(user);  // Benutzer aktualisieren
+        }
+        return null;  // Falls Benutzer nicht gefunden wurde
     }
 
-    // Methode zum Löschen eines Benutzers
-    public void deleteUser(int id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        userRepository.delete(user);
+    // Benutzer löschen
+    public void delete(int id) {
+        userRepository.deleteById(id);
     }
 }
 

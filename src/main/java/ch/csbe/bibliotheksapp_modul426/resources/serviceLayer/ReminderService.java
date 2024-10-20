@@ -18,14 +18,24 @@ public class ReminderService {
     @Autowired
     private LoanRepository loanRepository;
 
+    // Alle Erinnerungen abrufen
+    public List<Reminder> findAll() {
+        return reminderRepository.findAll();
+    }
+
+    // Erinnerung nach ID finden
+    public Reminder findById(int reminderId) {
+        return reminderRepository.findById(reminderId)
+                .orElse(null);  // Gibt null zurück, wenn keine Erinnerung gefunden wird
+    }
+
     // Methode zum Erstellen einer neuen Erinnerung
-    public Reminder createReminder(int loanId) {
-        // Finde die Ausleihe (Loan) über loanId
-        Loan loan = loanRepository.findById(loanId)
+    public Reminder save(Reminder reminder) {
+        // Finde die Ausleihe (Loan) über loanId aus dem Reminder-Objekt
+        Loan loan = loanRepository.findById(reminder.getLoan().getId())
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
-        // Erstelle eine neue Erinnerung (Reminder)
-        Reminder reminder = new Reminder();
+        // Verknüpfe die Erinnerung mit der Ausleihe
         reminder.setLoan(loan);
         reminder.setEmailSent(false);  // Standardmäßig ist die E-Mail noch nicht gesendet
 
@@ -33,24 +43,20 @@ public class ReminderService {
         return reminderRepository.save(reminder);
     }
 
-    // Methode zum Markieren der Erinnerung als "E-Mail gesendet"
-    public Reminder markEmailAsSent(int reminderId) {
+    // Methode zum Aktualisieren einer Erinnerung (z.B. Markieren der E-Mail als gesendet)
+    public Reminder update(int reminderId, Reminder updatedReminder) {
         // Finde die Erinnerung über reminderId
         Reminder reminder = reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new RuntimeException("Reminder not found"));
 
-        // Setze das Feld "emailSent" auf true, um zu kennzeichnen, dass die E-Mail gesendet wurde
-        reminder.setEmailSent(true);
+        // Aktualisiere die Erinnerung (hier speziell das "emailSent"-Feld)
+        reminder.setEmailSent(updatedReminder.isEmailSent());
 
-        // Speichere die aktualisierte Erinnerung in der Datenbank
         return reminderRepository.save(reminder);
     }
 
-    // Methode zum Abrufen aller Erinnerungen für eine bestimmte Loan (optional)
-    public List<Reminder> getRemindersForLoan(int loanId) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new RuntimeException("Loan not found"));
-
-        return reminderRepository.findByLoan(loan);
+    // Erinnerung löschen
+    public void delete(int reminderId) {
+        reminderRepository.deleteById(reminderId);
     }
 }

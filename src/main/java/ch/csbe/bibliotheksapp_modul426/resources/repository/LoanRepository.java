@@ -12,6 +12,8 @@ public interface LoanRepository extends JpaRepository<Loan, Integer> {
     // Benutzerdefinierte Abfrage, um alle Loans eines Benutzers zu finden
     List<Loan> findByUserId(Integer userId);
 
+    List<Loan> findByBookId(Integer bookId);
+
     // Jenachdem werden wir noch weitere Benutzerdefinierte Abdfragen hinzufügen
     // Das JpaRepository-Interface bietet bereits vordefinierte Methoden für CRUD-Operationen wie save(),
     // findAll(), findById(), delete() usw.

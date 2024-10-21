@@ -1,5 +1,8 @@
 package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
 
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.LoanCreateDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.LoanShowDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.LoanUpdateDto;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Book;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Loan;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.User;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LoanService {
@@ -25,74 +29,76 @@ public class LoanService {
     private UserRepository userRepository;
 
     // Alle Ausleihen abrufen
-    public List<Loan> findAll() {
-        return loanRepository.findAll();
+    public List<LoanShowDto> findAll() {
+        return loanRepository.findAll().stream()
+                .map(this::toLoanShowDto)
+                .collect(Collectors.toList());
     }
 
     // Ausleihe nach ID finden
-    public Loan findById(int loanId) {
-        return loanRepository.findById(loanId)
-                .orElse(null); // Gibt null zurück, wenn keine Ausleihe gefunden wird
+    public LoanShowDto findById(int loanId) {
+        Loan loan = loanRepository.findById(loanId).orElse(null);
+        return loan != null ? toLoanShowDto(loan) : null;
     }
 
     // Methode für das Ausleihen eines Buches
-    public Loan save(Loan loan) {
-        // Finde das Buch basierend auf der Buch-ID im Loan-Objekt
-        Book book = bookRepository.findById(loan.getBook().getId())
+    public LoanShowDto save(LoanCreateDto loanCreateDto) {
+        Book book = bookRepository.findById(loanCreateDto.getBookId())
                 .orElseThrow(() -> new RuntimeException("Book not found"));
 
-        // Prüfe, ob das Buch verfügbar ist
         if (!book.isAvailable()) {
             throw new RuntimeException("Book is already borrowed");
         }
 
-        // Finde den Benutzer basierend auf der Benutzer-ID im Loan-Objekt
-        User user = userRepository.findById(loan.getUser().getId())
+        User user = userRepository.findById(loanCreateDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Verknüpfe die Ausleihe mit dem gefundenen Benutzer und Buch
+        Loan loan = new Loan();
         loan.setUser(user);
         loan.setBook(book);
-        loan.setLoanDate(LocalDate.now().toString());  // Setze das aktuelle Datum
+        loan.setLoanDate(LocalDate.now().toString());
         loan.setStatus("Borrowed");
 
-        // Setze das Buch auf "nicht verfügbar"
         book.setAvailable(false);
-        bookRepository.save(book);  // Speichere die Änderung am Buch
+        bookRepository.save(book);
 
-        // Speichere die Ausleihe und gib sie zurück
-        return loanRepository.save(loan);
+        return toLoanShowDto(loanRepository.save(loan));
     }
 
     // Methode für die Rückgabe eines Buches
-    public Loan update(int loanId, Loan updatedLoan) {
-        // Finde die bestehende Ausleihe
+    public LoanShowDto update(int loanId, LoanUpdateDto loanUpdateDto) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
-        // Finde das zugehörige Buch
         Book book = loan.getBook();
 
-        // Wenn das Buch in der aktualisierten Ausleihe als zurückgegeben markiert wurde
-        if (updatedLoan.getReturnDate() != null) {
-            // Setze das Buch auf "verfügbar"
+        if (loanUpdateDto.getReturnDate() != null) {
             book.setAvailable(true);
-            bookRepository.save(book);  // Speichere die Änderung am Buch
-
-            // Aktualisiere die Ausleihe mit dem Rückgabedatum und Status
-            loan.setReturnDate(LocalDate.now().toString());
+            bookRepository.save(book);
+            loan.setReturnDate(loanUpdateDto.getReturnDate());
             loan.setStatus("Returned");
         } else {
-            // Falls keine Rückgabe, aktualisiert nur andere relevante Felder der Ausleihe
-            loan.setStatus(updatedLoan.getStatus());
-            loan.setLoanDate(updatedLoan.getLoanDate());
+            loan.setStatus(loanUpdateDto.getStatus());
         }
 
-        return loanRepository.save(loan);  // Speichere die aktualisierte Ausleihe
+        return toLoanShowDto(loanRepository.save(loan));
     }
 
     // Ausleihe löschen
     public void delete(int loanId) {
         loanRepository.deleteById(loanId);
+    }
+
+    private LoanShowDto toLoanShowDto(Loan loan) {
+        LoanShowDto loanShowDto = new LoanShowDto();
+        loanShowDto.setId(loan.getId());
+        loanShowDto.setBookId(loan.getBook().getId());
+        loanShowDto.setBookTitle(loan.getBook().getTitle());
+        loanShowDto.setUserId(loan.getUser().getId());
+        loanShowDto.setUserName(loan.getUser().getName());
+        loanShowDto.setLoanDate(loan.getLoanDate());
+        loanShowDto.setReturnDate(loan.getReturnDate());
+        loanShowDto.setStatus(loan.getStatus());
+        return loanShowDto;
     }
 }

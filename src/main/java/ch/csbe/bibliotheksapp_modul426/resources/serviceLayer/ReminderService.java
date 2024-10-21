@@ -1,5 +1,8 @@
 package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
 
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderCreateDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderShowDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderUpdateDto;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Loan;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Reminder;
 import ch.csbe.bibliotheksapp_modul426.resources.repository.LoanRepository;
@@ -8,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReminderService {
@@ -19,44 +23,54 @@ public class ReminderService {
     private LoanRepository loanRepository;
 
     // Alle Erinnerungen abrufen
-    public List<Reminder> findAll() {
-        return reminderRepository.findAll();
+    public List<ReminderShowDto> findAll() {
+        return reminderRepository.findAll().stream()
+                .map(this::toReminderDto)
+                .collect(Collectors.toList());
     }
 
     // Erinnerung nach ID finden
-    public Reminder findById(int reminderId) {
-        return reminderRepository.findById(reminderId)
+    public ReminderShowDto findById(int reminderId) {
+        Reminder reminder = reminderRepository.findById(reminderId)
                 .orElse(null);  // Gibt null zurück, wenn keine Erinnerung gefunden wird
+        return reminder != null ? toReminderDto(reminder) : null;
     }
 
     // Methode zum Erstellen einer neuen Erinnerung
-    public Reminder save(Reminder reminder) {
-        // Finde die Ausleihe (Loan) über loanId aus dem Reminder-Objekt
-        Loan loan = loanRepository.findById(reminder.getLoan().getId())
+    public ReminderShowDto save(ReminderCreateDto reminderCreateDto) {
+        Loan loan = loanRepository.findById(reminderCreateDto.getLoanId())
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
-        // Verknüpfe die Erinnerung mit der Ausleihe
+        Reminder reminder = new Reminder();
         reminder.setLoan(loan);
-        reminder.setEmailSent(false);  // Standardmäßig ist die E-Mail noch nicht gesendet
+        reminder.setEmailSent(false); // Standardmäßig ist die E-Mail noch nicht gesendet
 
-        // Speichere die Erinnerung in der Datenbank
-        return reminderRepository.save(reminder);
+        Reminder savedReminder = reminderRepository.save(reminder);
+        return toReminderDto(savedReminder);
     }
 
     // Methode zum Aktualisieren einer Erinnerung (z.B. Markieren der E-Mail als gesendet)
-    public Reminder update(int reminderId, Reminder updatedReminder) {
-        // Finde die Erinnerung über reminderId
+    public ReminderShowDto update(int reminderId, ReminderUpdateDto reminderUpdateDto) {
         Reminder reminder = reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new RuntimeException("Reminder not found"));
 
-        // Aktualisiere die Erinnerung (hier speziell das "emailSent"-Feld)
-        reminder.setEmailSent(updatedReminder.isEmailSent());
+        reminder.setEmailSent(reminderUpdateDto.isEmailSent());
 
-        return reminderRepository.save(reminder);
+        Reminder updatedReminder = reminderRepository.save(reminder);
+        return toReminderDto(updatedReminder);
     }
 
     // Erinnerung löschen
     public void delete(int reminderId) {
         reminderRepository.deleteById(reminderId);
+    }
+
+    // Umwandlung von Reminder in ReminderDto
+    private ReminderShowDto toReminderDto(Reminder reminder) {
+        ReminderShowDto reminderDto = new ReminderShowDto();
+        reminderDto.setId(reminder.getId());
+        reminderDto.setEmailSent(reminder.isEmailSent());
+        reminderDto.setLoanId(reminder.getLoan().getId());
+        return reminderDto;
     }
 }

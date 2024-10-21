@@ -1,11 +1,17 @@
-package ch.csbe.bibliotheksapp_modul426.resources.entities.serviceLayer;
+package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
 
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderCreateDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderUpdateDto;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Loan;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Reminder;
+import ch.csbe.bibliotheksapp_modul426.resources.repository.LoanRepository;
+import ch.csbe.bibliotheksapp_modul426.resources.repository.ReminderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReminderService {
@@ -16,39 +22,55 @@ public class ReminderService {
     @Autowired
     private LoanRepository loanRepository;
 
-    // Methode zum Erstellen einer neuen Erinnerung
-    public Reminder createReminder(int loanId) {
-        // Finde die Ausleihe (Loan) über loanId
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new RuntimeException("Loan not found"));
-
-        // Erstelle eine neue Erinnerung (Reminder)
-        Reminder reminder = new Reminder();
-        reminder.setLoan(loan);
-        reminder.setEmailSent(false);  // Standardmäßig ist die E-Mail noch nicht gesendet
-
-        // Speichere die Erinnerung in der Datenbank
-        return reminderRepository.save(reminder);
+    // Alle Erinnerungen abrufen
+    public List<ReminderDto> findAll() {
+        return reminderRepository.findAll().stream()
+                .map(this::toReminderDto)
+                .collect(Collectors.toList());
     }
 
-    // Methode zum Markieren der Erinnerung als "E-Mail gesendet"
-    public Reminder markEmailAsSent(int reminderId) {
-        // Finde die Erinnerung über reminderId
+    // Erinnerung nach ID finden
+    public ReminderDto findById(int reminderId) {
+        Reminder reminder = reminderRepository.findById(reminderId)
+                .orElse(null);  // Gibt null zurück, wenn keine Erinnerung gefunden wird
+        return reminder != null ? toReminderDto(reminder) : null;
+    }
+
+    // Methode zum Erstellen einer neuen Erinnerung
+    public ReminderDto save(ReminderCreateDto reminderCreateDto) {
+        Loan loan = loanRepository.findById(reminderCreateDto.getLoanId())
+                .orElseThrow(() -> new RuntimeException("Loan not found"));
+
+        Reminder reminder = new Reminder();
+        reminder.setLoan(loan);
+        reminder.setEmailSent(false); // Standardmäßig ist die E-Mail noch nicht gesendet
+
+        Reminder savedReminder = reminderRepository.save(reminder);
+        return toReminderDto(savedReminder);
+    }
+
+    // Methode zum Aktualisieren einer Erinnerung (z.B. Markieren der E-Mail als gesendet)
+    public ReminderDto update(int reminderId, ReminderUpdateDto reminderUpdateDto) {
         Reminder reminder = reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new RuntimeException("Reminder not found"));
 
-        // Setze das Feld "emailSent" auf true, um zu kennzeichnen, dass die E-Mail gesendet wurde
-        reminder.setEmailSent(true);
+        reminder.setEmailSent(reminderUpdateDto.isEmailSent());
 
-        // Speichere die aktualisierte Erinnerung in der Datenbank
-        return reminderRepository.save(reminder);
+        Reminder updatedReminder = reminderRepository.save(reminder);
+        return toReminderDto(updatedReminder);
     }
 
-    // Methode zum Abrufen aller Erinnerungen für eine bestimmte Loan (optional)
-    public List<Reminder> getRemindersForLoan(int loanId) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new RuntimeException("Loan not found"));
+    // Erinnerung löschen
+    public void delete(int reminderId) {
+        reminderRepository.deleteById(reminderId);
+    }
 
-        return reminderRepository.findByLoan(loan);
+    // Umwandlung von Reminder in ReminderDto
+    private ReminderDto toReminderDto(Reminder reminder) {
+        ReminderDto reminderDto = new ReminderDto();
+        reminderDto.setId(reminder.getId());
+        reminderDto.setEmailSent(reminder.isEmailSent());
+        reminderDto.setLoanId(reminder.getLoan().getId());
+        return reminderDto;
     }
 }

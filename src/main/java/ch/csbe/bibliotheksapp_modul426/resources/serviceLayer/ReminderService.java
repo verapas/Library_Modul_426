@@ -1,5 +1,6 @@
 package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
 
+import ch.csbe.bibliotheksapp_modul426.resources.mapper.ReminderMapper;
 import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderCreateDto;
 import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderShowDto;
 import ch.csbe.bibliotheksapp_modul426.resources.dto.Reminder.ReminderUpdateDto;
@@ -22,10 +23,13 @@ public class ReminderService {
     @Autowired
     private LoanRepository loanRepository;
 
+    @Autowired
+    private ReminderMapper reminderMapper;
+
     // Alle Erinnerungen abrufen
     public List<ReminderShowDto> findAll() {
         return reminderRepository.findAll().stream()
-                .map(this::toReminderDto)
+                .map(reminderMapper::toReminderDto)
                 .collect(Collectors.toList());
     }
 
@@ -33,7 +37,7 @@ public class ReminderService {
     public ReminderShowDto findById(int reminderId) {
         Reminder reminder = reminderRepository.findById(reminderId)
                 .orElse(null);  // Gibt null zurück, wenn keine Erinnerung gefunden wird
-        return reminder != null ? toReminderDto(reminder) : null;
+        return reminder != null ? reminderMapper.toReminderDto(reminder) : null;
     }
 
     // Methode zum Erstellen einer neuen Erinnerung
@@ -41,36 +45,26 @@ public class ReminderService {
         Loan loan = loanRepository.findById(reminderCreateDto.getLoanId())
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
-        Reminder reminder = new Reminder();
-        reminder.setLoan(loan);
+        Reminder reminder = reminderMapper.toReminderEntity(reminderCreateDto);
         reminder.setEmailSent(false); // Standardmäßig ist die E-Mail noch nicht gesendet
 
         Reminder savedReminder = reminderRepository.save(reminder);
-        return toReminderDto(savedReminder);
+        return reminderMapper.toReminderDto(savedReminder);
     }
 
-    // Methode zum Aktualisieren einer Erinnerung (z.B. Markieren der E-Mail als gesendet)
+    // Methode zum Aktualisieren einer Erinnerung
     public ReminderShowDto update(int reminderId, ReminderUpdateDto reminderUpdateDto) {
         Reminder reminder = reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new RuntimeException("Reminder not found"));
 
-        reminder.setEmailSent(reminderUpdateDto.isEmailSent());
+        reminderMapper.updateReminderEntity(reminderUpdateDto, reminder);
 
         Reminder updatedReminder = reminderRepository.save(reminder);
-        return toReminderDto(updatedReminder);
+        return reminderMapper.toReminderDto(updatedReminder);
     }
 
     // Erinnerung löschen
     public void delete(int reminderId) {
         reminderRepository.deleteById(reminderId);
-    }
-
-    // Umwandlung von Reminder in ReminderDto
-    private ReminderShowDto toReminderDto(Reminder reminder) {
-        ReminderShowDto reminderDto = new ReminderShowDto();
-        reminderDto.setId(reminder.getId());
-        reminderDto.setEmailSent(reminder.isEmailSent());
-        reminderDto.setLoanId(reminder.getLoan().getId());
-        return reminderDto;
     }
 }

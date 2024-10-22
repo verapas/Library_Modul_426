@@ -1,8 +1,7 @@
 package ch.csbe.bibliotheksapp_modul426.resources.serviceLayer;
 
-import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.LoanCreateDto;
-import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.LoanShowDto;
-import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.LoanUpdateDto;
+import ch.csbe.bibliotheksapp_modul426.resources.mapper.LoanMapper;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.*;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Book;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.Loan;
 import ch.csbe.bibliotheksapp_modul426.resources.entities.User;
@@ -28,17 +27,20 @@ public class LoanService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LoanMapper loanMapper;
+
     // Alle Ausleihen abrufen
     public List<LoanShowDto> findAll() {
         return loanRepository.findAll().stream()
-                .map(this::toLoanShowDto)
+                .map(loanMapper::toLoanShowDto)
                 .collect(Collectors.toList());
     }
 
     // Ausleihe nach ID finden
     public LoanShowDto findById(int loanId) {
         Loan loan = loanRepository.findById(loanId).orElse(null);
-        return loan != null ? toLoanShowDto(loan) : null;
+        return loan != null ? loanMapper.toLoanShowDto(loan) : null;
     }
 
     // Methode für das Ausleihen eines Buches
@@ -53,16 +55,14 @@ public class LoanService {
         User user = userRepository.findById(loanCreateDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Loan loan = new Loan();
-        loan.setUser(user);
-        loan.setBook(book);
+        Loan loan = loanMapper.toLoanEntity(loanCreateDto);
         loan.setLoanDate(LocalDate.now().toString());
         loan.setStatus("Borrowed");
 
         book.setAvailable(false);
         bookRepository.save(book);
 
-        return toLoanShowDto(loanRepository.save(loan));
+        return loanMapper.toLoanShowDto(loanRepository.save(loan));
     }
 
     // Methode für die Rückgabe eines Buches
@@ -75,30 +75,16 @@ public class LoanService {
         if (loanUpdateDto.getReturnDate() != null) {
             book.setAvailable(true);
             bookRepository.save(book);
-            loan.setReturnDate(loanUpdateDto.getReturnDate());
-            loan.setStatus("Returned");
+            loanMapper.updateLoanEntity(loanUpdateDto, loan);
         } else {
             loan.setStatus(loanUpdateDto.getStatus());
         }
 
-        return toLoanShowDto(loanRepository.save(loan));
+        return loanMapper.toLoanShowDto(loanRepository.save(loan));
     }
 
     // Ausleihe löschen
     public void delete(int loanId) {
         loanRepository.deleteById(loanId);
-    }
-
-    private LoanShowDto toLoanShowDto(Loan loan) {
-        LoanShowDto loanShowDto = new LoanShowDto();
-        loanShowDto.setId(loan.getId());
-        loanShowDto.setBookId(loan.getBook().getId());
-        loanShowDto.setBookTitle(loan.getBook().getTitle());
-        loanShowDto.setUserId(loan.getUser().getId());
-        loanShowDto.setUserName(loan.getUser().getName());
-        loanShowDto.setLoanDate(loan.getLoanDate());
-        loanShowDto.setReturnDate(loan.getReturnDate());
-        loanShowDto.setStatus(loan.getStatus());
-        return loanShowDto;
     }
 }

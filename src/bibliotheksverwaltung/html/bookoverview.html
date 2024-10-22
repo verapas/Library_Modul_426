@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="css/style.css">
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bücherübersicht</title>
@@ -23,9 +25,10 @@
     tr:nth-child(even) {
       background-color: #f9f9f9;
     }
-    .bearbeiten {
-      position: relative;
-      left: 1450px;
+
+    /* Abstand zwischen Buttons und Tabelle */
+    .button-container {
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -33,14 +36,16 @@
 
 <header>
   <h1>Bücherübersicht</h1>
-  <nav>
-  </nav>
 </header>
-<button class="bearbeiten knopf">bearbeiten</button>
-<button class="hinzufügen knopf">hinzufügen</button>
 
 <main>
-  <section id="books">  
+  <section id="books">
+    <!-- Buttons zum Bearbeiten und Hinzufügen, ohne Styling -->
+    <div class="button-container">
+      <button class="hinzufügen">Hinzufügen</button>
+      <button class="bearbeiten">Bearbeiten</button>
+    </div>
+
     <table border="1" cellspacing="0" cellpadding="10">
       <thead>
       <tr>
@@ -57,8 +62,6 @@
     </table>
   </section>
 </main>
-
-
 
 <footer>
   <p>&copy; 2024 Bibliotheksverwaltung</p>

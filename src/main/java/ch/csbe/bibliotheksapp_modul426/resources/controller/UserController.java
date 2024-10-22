@@ -1,6 +1,9 @@
 package ch.csbe.bibliotheksapp_modul426.resources.controller;
 
-import ch.csbe.bibliotheksapp_modul426.resources.entities.User;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserCreateDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserDetailDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserShowDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserUpdateDto;
 import ch.csbe.bibliotheksapp_modul426.resources.serviceLayer.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,15 +21,15 @@ public class UserController {
 
     // Alle Benutzer abrufen
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAll();
+    public ResponseEntity<List<UserShowDto>> getAllUsers() {
+        List<UserShowDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
 
     // Benutzer nach ID abrufen
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        User user = userService.findById(id);
+    public ResponseEntity<UserDetailDto> getUserById(@PathVariable Integer id) {
+        UserDetailDto user = userService.findById(id);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -35,25 +38,25 @@ public class UserController {
 
     // Neuen Benutzer erstellen
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.save(user);
+    public ResponseEntity<UserShowDto> createUser(@RequestBody UserCreateDto userCreateDto) {
+        UserShowDto createdUser = userService.save(userCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     // Benutzer aktualisieren
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
-        User user = userService.update(id, updatedUser);
-        if (user == null) {
+    public ResponseEntity<UserShowDto> updateUser(@PathVariable Integer id, @RequestBody UserUpdateDto userUpdateDto) {
+        UserShowDto updatedUser = userService.update(id, userUpdateDto);
+        if (updatedUser == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(updatedUser);
     }
 
     // Benutzer löschen
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
-        User user = userService.findById(id);
+        UserDetailDto user = userService.findById(id);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

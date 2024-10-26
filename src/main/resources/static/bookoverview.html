@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="css/style.css">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bücherübersicht</title>
@@ -29,6 +28,46 @@
     /* Abstand zwischen Buttons und Tabelle */
     .button-container {
       margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      width: 100%; /* Die Breite des Containers auf 100% setzen */
+    }
+
+    /* Größere Buttons über die gesamte Breite */
+    .button-container button {
+      margin-bottom: 10px;
+      padding: 15px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%; /* Button auf die volle Breite setzen */
+      text-align: left;
+    }
+
+    .button-container button:hover {
+      background-color: #34495e;
+    }
+
+    /* Formular-Styling */
+    .form-container {
+      display: none; /* Formular zunächst verstecken */
+      margin-bottom: 20px;
+    }
+
+    .form-container input {
+      margin: 5px;
+      padding: 5px;
+    }
+
+    .action-buttons {
+      display: none; /* Zunächst verstecken */
+      gap: 10px;
+    }
+
+    .action-buttons button {
+      padding: 5px 10px;
     }
   </style>
 </head>
@@ -40,10 +79,26 @@
 
 <main>
   <section id="books">
-    <!-- Buttons zum Bearbeiten und Hinzufügen, ohne Styling -->
+    <!-- Buttons zum Bearbeiten und Hinzufügen -->
     <div class="button-container">
-      <button class="hinzufügen">Hinzufügen</button>
-      <button class="bearbeiten">Bearbeiten</button>
+      <button id="hinzufügen-btn">Hinzufügen</button>
+      <button id="bearbeiten-btn">Bearbeiten</button> <!-- Bearbeiten-Button hinzugefügt -->
+    </div>
+
+    <!-- Formular zum Hinzufügen/Bearbeiten von Büchern -->
+    <div class="form-container" id="form-container">
+      <input type="hidden" id="edit-index" value=""> <!-- Verstecktes Feld für die Bearbeitung -->
+      <label for="isbn">ISBN:</label>
+      <input type="text" id="isbn" required>
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
+      <label for="autor">Autor:</label>
+      <input type="text" id="autor" required>
+      <label for="genre">Genre:</label>
+      <input type="text" id="genre" required>
+      <label for="verfügbarkeit">Verfügbarkeit:</label>
+      <input type="text" id="verfügbarkeit" required>
+      <button id="submit-btn">Buch hinzufügen</button>
     </div>
 
     <table border="1" cellspacing="0" cellpadding="10">
@@ -54,10 +109,11 @@
         <th>Autor</th>
         <th>Genre</th>
         <th>Verfügbarkeit</th>
+        <th>Aktionen</th>
       </tr>
       </thead>
-      <tbody>
-      <!-- Hier kannst du Buchdaten hinzufügen -->
+      <tbody id="book-table-body">
+      <!-- Hier kommen die Buchdaten -->
       </tbody>
     </table>
   </section>
@@ -67,6 +123,110 @@
   <p>&copy; 2024 Bibliotheksverwaltung</p>
 </footer>
 
-<script src="js/script.js"></script>
+<script>
+  let editMode = false;  // Variable zum Überprüfen, ob wir im Bearbeitungsmodus sind
+  let currentEditIndex = null;  // Zum Speichern der Zeilen-ID, die bearbeitet wird
+
+  const hinzufügenBtn = document.getElementById('hinzufügen-btn');
+  const bearbeitenBtn = document.getElementById('bearbeiten-btn');
+  const formContainer = document.getElementById('form-container');
+  const submitBtn = document.getElementById('submit-btn');
+  const bookTableBody = document.getElementById('book-table-body');
+
+  // Formular ein-/ausblenden
+  hinzufügenBtn.addEventListener('click', () => {
+    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+    resetForm(); // Formular zurücksetzen, falls wir im Bearbeitungsmodus waren
+  });
+
+  // Aktion für den Bearbeiten-Button
+  bearbeitenBtn.addEventListener('click', () => {
+    // Aktionen für die Zeilen anzeigen
+    const actionButtons = document.querySelectorAll('.action-buttons');
+    actionButtons.forEach(buttonGroup => {
+      buttonGroup.style.display = 'flex'; // Aktionen sichtbar machen
+    });
+  });
+
+  // Neues Buch hinzufügen oder bestehendes bearbeiten
+  submitBtn.addEventListener('click', (event) => {
+    event.preventDefault(); // Verhindert das Standardformularverhalten
+
+    const isbn = document.getElementById('isbn').value;
+    const name = document.getElementById('name').value;
+    const autor = document.getElementById('autor').value;
+    const genre = document.getElementById('genre').value;
+    const verfügbarkeit = document.getElementById('verfügbarkeit').value;
+
+    if (editMode) {
+      // Buch bearbeiten
+      const row = document.querySelector(`#book-table-body tr[data-index="${currentEditIndex}"]`);
+      row.innerHTML = `
+        <td>${isbn}</td>
+        <td>${name}</td>
+        <td>${autor}</td>
+        <td>${genre}</td>
+        <td>${verfügbarkeit}</td>
+        <td class="action-buttons">
+          <button class="edit-btn" onclick="editBook(${currentEditIndex})">Bearbeiten</button>
+          <button class="delete-btn" onclick="deleteBook(${currentEditIndex})">Löschen</button>
+        </td>
+      `;
+      resetForm();
+    } else {
+      // Neues Buch hinzufügen
+      const newRow = document.createElement('tr');
+      const newIndex = bookTableBody.rows.length;
+      newRow.setAttribute('data-index', newIndex);
+      newRow.innerHTML = `
+        <td>${isbn}</td>
+        <td>${name}</td>
+        <td>${autor}</td>
+        <td>${genre}</td>
+        <td>${verfügbarkeit}</td>
+        <td class="action-buttons">
+          <button class="edit-btn" onclick="editBook(${newIndex})">Bearbeiten</button>
+          <button class="delete-btn" onclick="deleteBook(${newIndex})">Löschen</button>
+        </td>
+      `;
+      bookTableBody.appendChild(newRow);
+      resetForm();
+    }
+  });
+
+  function editBook(index) {
+    const row = document.querySelector(`#book-table-body tr[data-index="${index}"]`);
+    const cells = row.getElementsByTagName('td');
+
+    // Formular mit den bestehenden Werten füllen
+    document.getElementById('isbn').value = cells[0].innerText;
+    document.getElementById('name').value = cells[1].innerText;
+    document.getElementById('autor').value = cells[2].innerText;
+    document.getElementById('genre').value = cells[3].innerText;
+    document.getElementById('verfügbarkeit').value = cells[4].innerText;
+
+    editMode = true;
+    currentEditIndex = index;
+
+    formContainer.style.display = 'block';
+  }
+
+  // Funktion zum Löschen eines Buches
+  function deleteBook(index) {
+    const row = document.querySelector(`#book-table-body tr[data-index="${index}"]`);
+    bookTableBody.removeChild(row);
+  }
+
+  function resetForm() {
+    document.getElementById('isbn').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('autor').value = '';
+    document.getElementById('genre').value = '';
+    document.getElementById('verfügbarkeit').value = '';
+    editMode = false;
+    currentEditIndex = null;
+  }
+</script>
+
 </body>
 </html>

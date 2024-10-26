@@ -19,14 +19,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // Alle Benutzer abrufen
+    /**
+     * Gibt eine Liste aller Benutzer zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/users
+     */
     @GetMapping
     public ResponseEntity<List<UserShowDto>> getAllUsers() {
         List<UserShowDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
 
-    // Benutzer nach ID abrufen
+    /**
+     * Gibt die Details eines Benutzers anhand der ID zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/users/{id}
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UserDetailDto> getUserById(@PathVariable Integer id) {
         UserDetailDto user = userService.findById(id);
@@ -36,14 +44,36 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // Neuen Benutzer erstellen
-    @PostMapping
-    public ResponseEntity<UserShowDto> createUser(@RequestBody UserCreateDto userCreateDto) {
-        UserShowDto createdUser = userService.save(userCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    /**
+     * Registriert einen neuen Benutzer.
+     * Methode: POST
+     * URL: http://localhost:8080/users/register
+     */
+    @PostMapping("/register")
+    public ResponseEntity<UserShowDto> registerUser(@RequestBody UserCreateDto userCreateDto) {
+        UserShowDto registeredUser = userService.registerUser(userCreateDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
     }
 
-    // Benutzer aktualisieren
+    /**
+     * Authentifiziert einen Benutzer basierend auf E-Mail und Passwort.
+     * Methode: POST
+     * URL: http://localhost:8080/users/login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<UserShowDto> loginUser(@RequestParam String email, @RequestParam String password) {
+        UserShowDto user = userService.authenticateUser(email, password);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    /**
+     * Aktualisiert die Informationen eines Benutzers.
+     * Methode: PUT
+     * URL: http://localhost:8080/users/{id}
+     */
     @PutMapping("/{id}")
     public ResponseEntity<UserShowDto> updateUser(@PathVariable Integer id, @RequestBody UserUpdateDto userUpdateDto) {
         UserShowDto updatedUser = userService.update(id, userUpdateDto);
@@ -53,7 +83,11 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    // Benutzer löschen
+    /**
+     * Löscht einen Benutzer anhand der ID.
+     * Methode: DELETE
+     * URL: http://localhost:8080/users/{id}
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
         UserDetailDto user = userService.findById(id);

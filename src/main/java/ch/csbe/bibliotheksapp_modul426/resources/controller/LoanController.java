@@ -18,14 +18,22 @@ public class LoanController {
     @Autowired
     private LoanService loanService;
 
-    // Alle Ausleihen abrufen
+    /**
+     * Gibt eine Liste aller Ausleihen zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/loans
+     */
     @GetMapping
     public ResponseEntity<List<LoanShowDto>> getAllLoans() {
         List<LoanShowDto> loans = loanService.findAll();
         return ResponseEntity.ok(loans);
     }
 
-    // Ausleihe nach ID abrufen
+    /**
+     * Gibt die Details einer Ausleihe anhand der ID zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/loans/{id}
+     */
     @GetMapping("/{id}")
     public ResponseEntity<LoanShowDto> getLoanById(@PathVariable Integer id) {
         LoanShowDto loan = loanService.findById(id);
@@ -35,14 +43,22 @@ public class LoanController {
         return ResponseEntity.ok(loan);
     }
 
-    // Neue Ausleihe erstellen
+    /**
+     * Erstellt eine neue Ausleihe.
+     * Methode: POST
+     * URL: http://localhost:8080/loans
+     */
     @PostMapping
     public ResponseEntity<LoanShowDto> createLoan(@RequestBody LoanCreateDto loanCreateDto) {
         LoanShowDto createdLoan = loanService.save(loanCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLoan);
     }
 
-    // Ausleihe aktualisieren
+    /**
+     * Aktualisiert die Informationen einer bestehenden Ausleihe.
+     * Methode: PUT
+     * URL: http://localhost:8080/loans/{id}
+     */
     @PutMapping("/{id}")
     public ResponseEntity<LoanShowDto> updateLoan(@PathVariable Integer id, @RequestBody LoanUpdateDto loanUpdateDto) {
         LoanShowDto updatedLoan = loanService.update(id, loanUpdateDto);
@@ -52,7 +68,11 @@ public class LoanController {
         return ResponseEntity.ok(updatedLoan);
     }
 
-    // Ausleihe löschen
+    /**
+     * Löscht eine Ausleihe anhand der ID.
+     * Methode: DELETE
+     * URL: http://localhost:8080/loans/{id}
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLoan(@PathVariable Integer id) {
         LoanShowDto loan = loanService.findById(id);

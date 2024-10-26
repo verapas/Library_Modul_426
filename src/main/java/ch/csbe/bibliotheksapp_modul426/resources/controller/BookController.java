@@ -19,14 +19,22 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    // Alle Bücher abrufen
+    /**
+     * Gibt eine Liste aller Bücher zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/books
+     */
     @GetMapping
     public ResponseEntity<List<BookShowDto>> getAllBooks() {
         List<BookShowDto> books = bookService.findAll();
         return ResponseEntity.ok(books);
     }
 
-    // Buch nach ID abrufen
+    /**
+     * Gibt die Details eines Buches anhand der ID zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/books/{id}
+     */
     @GetMapping("/{id}")
     public ResponseEntity<BookDetailDto> getBookById(@PathVariable Integer id) {
         BookDetailDto book = bookService.findById(id);
@@ -36,14 +44,22 @@ public class BookController {
         return ResponseEntity.ok(book);
     }
 
-    // Neues Buch erstellen
+    /**
+     * Erstellt ein neues Buch.
+     * Methode: POST
+     * URL: http://localhost:8080/books
+     */
     @PostMapping
     public ResponseEntity<BookShowDto> createBook(@RequestBody BookCreateDto bookCreateDto) {
         BookShowDto createdBook = bookService.save(bookCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 
-    // Buch aktualisieren
+    /**
+     * Aktualisiert die Informationen eines bestehenden Buches.
+     * Methode: PUT
+     * URL: http://localhost:8080/books/{id}
+     */
     @PutMapping("/{id}")
     public ResponseEntity<BookShowDto> updateBook(@PathVariable Integer id, @RequestBody BookUpdateDto bookUpdateDto) {
         BookShowDto updatedBook = bookService.update(id, bookUpdateDto);
@@ -53,7 +69,11 @@ public class BookController {
         return ResponseEntity.ok(updatedBook);
     }
 
-    // Buch löschen
+    /**
+     * Löscht ein Buch anhand der ID.
+     * Methode: DELETE
+     * URL: http://localhost:8080/books/{id}
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Integer id) {
         BookDetailDto book = bookService.findById(id);

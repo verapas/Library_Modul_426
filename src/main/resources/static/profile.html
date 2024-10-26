@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter Profil</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<main>
+    <section id="profile">
+        <h2>Mitarbeiterprofil</h2>
+        <!-- Profilformular zum Ansehen und Bearbeiten der Daten -->
+        <div class="profile-container">
+            <form action="/update-profile" method="POST">
+                <div class="input-group">
+                    <label for="lastname">Nachname:</label>
+                    <input type="text" id="lastname" name="lastname" value="Mustermann" required>
+                </div>
+                <div class="input-group">
+                    <label for="firstname">Vorname:</label>
+                    <input type="text" id="firstname" name="firstname" value="Max" required>
+                </div>
+                <div class="input-group">
+                    <label for="birthdate">Geburtsdatum:</label>
+                    <input type="date" id="birthdate" name="birthdate" value="1990-01-01" required>
+                </div>
+                <div class="input-group">
+                    <label for="gender">Geschlecht:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="male" selected>Männlich</option>
+                        <option value="female">Weiblich</option>
+                        <option value="other">Anderes</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="phone">Telefonnummer:</label>
+                    <input type="tel" id="phone" name="phone" value="123-456-7890" required>
+                </div>
+                <div class="input-group">
+                    <label for="email">E-Mail-Adresse:</label>
+                    <input type="email" id="email" name="email" value="max.mustermann@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="new-password">Neues Passwort:</label>
+                    <input type="password" id="new-password" name="new-password" required>
+                </div>
+                <div class="input-group">
+                    <label for="confirm-password">Passwort bestätigen:</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+
+                <button type="submit">Daten speichern</button>
+                <button type="button" onclick="window.history.back()">Zurück</button>
+
+            </form>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2024 Mitarbeiterverwaltung</p>
+</footer>
+
+<script src="../js/main.js"></script>
+</body>
+</html>

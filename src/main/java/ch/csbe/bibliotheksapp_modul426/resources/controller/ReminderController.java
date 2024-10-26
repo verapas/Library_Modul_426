@@ -18,14 +18,22 @@ public class ReminderController {
     @Autowired
     private ReminderService reminderService;
 
-    // Alle Erinnerungen abrufen
+    /**
+     * Gibt eine Liste aller Erinnerungen zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/reminders
+     */
     @GetMapping
     public ResponseEntity<List<ReminderShowDto>> getAllReminders() {
         List<ReminderShowDto> reminders = reminderService.findAll();
         return ResponseEntity.ok(reminders);
     }
 
-    // Erinnerung nach ID abrufen
+    /**
+     * Gibt die Details einer Erinnerung anhand der ID zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/reminders/{id}
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ReminderShowDto> getReminderById(@PathVariable Integer id) {
         ReminderShowDto reminder = reminderService.findById(id);
@@ -35,14 +43,22 @@ public class ReminderController {
         return ResponseEntity.ok(reminder);
     }
 
-    // Neue Erinnerung erstellen
+    /**
+     * Erstellt eine neue Erinnerung.
+     * Methode: POST
+     * URL: http://localhost:8080/reminders
+     */
     @PostMapping
     public ResponseEntity<ReminderShowDto> createReminder(@RequestBody ReminderCreateDto reminderCreateDto) {
         ReminderShowDto createdReminder = reminderService.save(reminderCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReminder);
     }
 
-    // Erinnerung aktualisieren
+    /**
+     * Aktualisiert die Informationen einer bestehenden Erinnerung.
+     * Methode: PUT
+     * URL: http://localhost:8080/reminders/{id}
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ReminderShowDto> updateReminder(@PathVariable Integer id, @RequestBody ReminderUpdateDto reminderUpdateDto) {
         ReminderShowDto updatedReminder = reminderService.update(id, reminderUpdateDto);
@@ -52,7 +68,11 @@ public class ReminderController {
         return ResponseEntity.ok(updatedReminder);
     }
 
-    // Erinnerung löschen
+    /**
+     * Löscht eine Erinnerung anhand der ID.
+     * Methode: DELETE
+     * URL: http://localhost:8080/reminders/{id}
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReminder(@PathVariable Integer id) {
         ReminderShowDto reminder = reminderService.findById(id);

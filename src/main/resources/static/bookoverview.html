@@ -9,6 +9,18 @@
 <body>
 
 <header>
+  <div class="burger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="unsichtbar">
+    <ul>
+      <li><a href="profile.html">Profil</a></li>
+      <li><a href="registration_form.html">Registrieren</a></li>
+      <li><a href="index.html">Abmelden</a></li>
+    </ul>
+  </div>
   <h1>Bücherübersicht</h1>
 </header>
 
@@ -179,6 +191,16 @@
   function editBook(index) { /*...*/ }
   function deleteBook(index) { /*...*/ }
   function resetForm() { /*...*/ }
+
+
+  // Hamburger Menü-Logik
+  const burger = document.querySelector(".burger");
+  const offScreenMenu = document.querySelector(".unsichtbar");
+
+  burger.addEventListener("click", () => {
+    burger.classList.toggle("active"); // Aktiviert oder deaktiviert die 'active'-Klasse beim Burger-Icon
+    offScreenMenu.classList.toggle("active"); // Aktiviert oder deaktiviert die 'active'-Klasse beim Menü
+  });
 
 </script>
 

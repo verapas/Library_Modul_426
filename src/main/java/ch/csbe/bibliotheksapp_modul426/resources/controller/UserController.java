@@ -1,9 +1,6 @@
 package ch.csbe.bibliotheksapp_modul426.resources.controller;
 
-import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserCreateDto;
-import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserDetailDto;
-import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserShowDto;
-import ch.csbe.bibliotheksapp_modul426.resources.dto.User.UserUpdateDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.User.*;
 import ch.csbe.bibliotheksapp_modul426.resources.serviceLayer.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,8 +58,11 @@ public class UserController {
      * URL: http://localhost:8080/users/login
      */
     @PostMapping("/login")
-    public ResponseEntity<UserShowDto> loginUser(@RequestParam String email, @RequestParam String password) {
-        UserShowDto user = userService.authenticateUser(email, password);
+    public ResponseEntity<UserShowDto> loginUser(@RequestBody LoginRequestDto loginRequestDto) {
+        System.out.println("Email: " + loginRequestDto.getEmail());
+        System.out.println("Password: " + loginRequestDto.getPassword());
+
+        UserShowDto user = userService.authenticateUser(loginRequestDto.getEmail(), loginRequestDto.getPassword());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

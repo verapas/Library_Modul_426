@@ -35,18 +35,16 @@ public class BookService {
 
     // Buch nach ID finden
     public BookDetailDto findById(Integer id) {
-        Book book = bookRepository.findById(id)
-                .orElse(null);
-        if (book != null) {
-
-            return null;  // BookDetailDto wird noch angepasst
-        }
-        return null;
+        return bookRepository.findById(id)
+                .map(bookMapper::toBookDetailDto) // Konvertierung in DTO falls gefunden
+                .orElse(null); // Rückgabe von null, wenn nicht gefunden
     }
+
 
     // Neues Buch erstellen
     public BookShowDto save(BookCreateDto bookCreateDto) {
         Book book = bookMapper.toBookEntity(bookCreateDto);
+        book.setAvailable(true);  // Setzt den Standardwert für Verfügbarkeit
         Book savedBook = bookRepository.save(book);
         return bookMapper.toBookShowDto(savedBook);
     }

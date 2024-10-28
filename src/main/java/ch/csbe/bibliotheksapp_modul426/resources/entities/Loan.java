@@ -10,7 +10,7 @@ import java.util.List;
 public class Loan {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String loanDate; // FORMAT: YYYY-MM-DD
@@ -19,19 +19,17 @@ public class Loan {
 
     private String status; // ENUM: "ausgeliehen", "zurückgegeben"
 
-
     // Mehrere Loans gehören zu einem User
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)  // Benutzer wird sofort geladen
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     // Mehrere Loans gehören zu einem Buch
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)  // Buch wird sofort geladen
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     // Eine Ausleihe kann mehrere Erinnerungen (reminders) haben
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     private List<Reminder> reminders;  // Liste der Erinnerungen für eine Loan
-
 }

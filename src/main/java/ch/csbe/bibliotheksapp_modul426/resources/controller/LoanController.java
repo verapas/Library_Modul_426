@@ -54,19 +54,6 @@ public class LoanController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLoan);
     }
 
-    /**
-     * Aktualisiert die Informationen einer bestehenden Ausleihe.
-     * Methode: PUT
-     * URL: http://localhost:8080/loans/{id}
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<LoanShowDto> updateLoan(@PathVariable Integer id, @RequestBody LoanUpdateDto loanUpdateDto) {
-        LoanShowDto updatedLoan = loanService.update(id, loanUpdateDto);
-        if (updatedLoan == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(updatedLoan);
-    }
 
     /**
      * Löscht eine Ausleihe anhand der ID.

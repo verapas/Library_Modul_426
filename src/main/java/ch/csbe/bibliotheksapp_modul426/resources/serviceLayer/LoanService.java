@@ -65,23 +65,6 @@ public class LoanService {
         return loanMapper.toLoanShowDto(loanRepository.save(loan));
     }
 
-    // Methode für die Rückgabe eines Buches
-    public LoanShowDto update(int loanId, LoanUpdateDto loanUpdateDto) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new RuntimeException("Loan not found"));
-
-        Book book = loan.getBook();
-
-        if (loanUpdateDto.getReturnDate() != null) {
-            book.setAvailable(true);
-            bookRepository.save(book);
-            loanMapper.updateLoanEntity(loanUpdateDto, loan);
-        } else {
-            loan.setStatus(loanUpdateDto.getStatus());
-        }
-
-        return loanMapper.toLoanShowDto(loanRepository.save(loan));
-    }
 
     // Ausleihe löschen
     public void delete(int loanId) {

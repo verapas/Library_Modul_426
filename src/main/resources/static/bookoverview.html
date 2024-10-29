@@ -51,7 +51,7 @@
           <option value="title">Name</option>
           <option value="author">Autor</option>
           <option value="genre">Genre</option>
-          <option value="available">Verfügbarkeit</option>
+          <option value="available">Verfügbar</option>
         </select>
         <label for="filter-wert">Wert:</label>
         <input type="text" id="filter-wert" placeholder="Filterwert eingeben">
@@ -70,8 +70,11 @@
       <input type="text" id="author" required>
       <label for="genre">Genre:</label>
       <input type="text" id="genre" required>
-      <label for="available">Verfügbarkeit:</label>
-      <input type="text" id="available" required>
+      <label for="available">Verfügbar:</label>
+      <select id="available" required disabled>
+        <option value="true" selected>Ja</option>
+        <option value="false">Nein</option>
+      </select>
       <button id="submit-btn">Buch hinzufügen</button>
     </div>
 
@@ -83,7 +86,7 @@
         <th>Name</th>
         <th>Autor</th>
         <th>Genre</th>
-        <th>Verfügbarkeit</th>
+        <th>Verfügbar</th>
         <th>Aktionen</th>
       </tr>
       </thead>
@@ -119,7 +122,7 @@
       title: document.getElementById('title').value,
       author: document.getElementById('author').value,
       genre: document.getElementById('genre').value,
-      available: document.getElementById('available').value
+      available: document.getElementById('available').value === 'true'
     };
     saveBook(bookData)
     resetForm();
@@ -210,7 +213,8 @@
     document.getElementById('title').value = book.title;
     document.getElementById('author').value = book.author;
     document.getElementById('genre').value = book.genre;
-    document.getElementById('available').value = book.available;
+    document.getElementById('available').value = book.available.toString();
+    document.getElementById('available').disabled = false;
 
     // Formular anzeigen und Submit-Button Text ändern
     formContainer.style.display = 'block';
@@ -232,7 +236,8 @@
     document.getElementById('title').value = '';
     document.getElementById('author').value = '';
     document.getElementById('genre').value = '';
-    document.getElementById('available').value = '';
+    document.getElementById('available').value = 'true';
+    document.getElementById('available').disabled = true;
 
     // Formular ausblenden
     formContainer.style.display = 'none';

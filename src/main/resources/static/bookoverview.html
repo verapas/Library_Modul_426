@@ -28,7 +28,7 @@
   <section id="books">
     <!-- Buttons zum Bearbeiten und Hinzufügen -->
     <div class="button-container">
-      <button id="hinzufügen-btn">Hinzufügen</button>
+      <button id="hinzufuegen-btn">Hinzufügen</button>
       <button id="bearbeiten-btn">Bearbeiten</button>
     </div>
 
@@ -52,9 +52,10 @@
           <option value="name">Name</option>
           <option value="autor">Autor</option>
           <option value="genre">Genre</option>
-          <option value="verfügbarkeit">Verfügbarkeit</option>
+          <option value="verfuegbarkeit">Verfügbarkeit</option>
           <option value="abgabedatum">Abgabedatum</option>
         </select>
+        <label for="filter-wert">Wert:</label>
         <input type="text" id="filter-wert" placeholder="Filterwert eingeben">
         <button onclick="filterBooks()">Filtern</button>
       </div>
@@ -71,15 +72,15 @@
       <input type="text" id="autor" required>
       <label for="genre">Genre:</label>
       <input type="text" id="genre" required>
-      <label for="verfügbarkeit">Verfügbarkeit:</label>
-      <input type="text" id="verfügbarkeit" required>
+      <label for="verfuegbarkeit">Verfügbarkeit:</label>
+      <input type="text" id="verfuegbarkeit" required>
       <label for="abgabedatum">Abgabedatum:</label>
       <input type="text" id="abgabedatum" placeholder="YYYY-MM-DD" required>
       <button id="submit-btn">Buch hinzufügen</button>
     </div>
 
     <!-- Tabelle zur Anzeige der Bücher -->
-    <table border="1" cellspacing="0" cellpadding="10">
+    <table>
       <thead>
       <tr>
         <th>ISBN</th>
@@ -106,14 +107,14 @@
   let editMode = false;
   let currentEditIndex = null;
 
-  const hinzufügenBtn = document.getElementById('hinzufügen-btn');
+  const hinzufuegenBtn = document.getElementById('hinzufuegen-btn');
   const bearbeitenBtn = document.getElementById('bearbeiten-btn');
   const formContainer = document.getElementById('form-container');
   const submitBtn = document.getElementById('submit-btn');
   const bookTableBody = document.getElementById('book-table-body');
 
-  hinzufügenBtn.addEventListener('click', () => {
-    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+  hinzufuegenBtn.addEventListener('click', () => {
+    formContainer.style.display = formContainer.style.display !== 'block' ? 'block' : 'none';
     resetForm();
   });
 
@@ -124,7 +125,7 @@
     const name = document.getElementById('name').value;
     const autor = document.getElementById('autor').value;
     const genre = document.getElementById('genre').value;
-    const verfügbarkeit = document.getElementById('verfügbarkeit').value;
+    const verfuegbarkeit = document.getElementById('verfuegbarkeit').value;
     const abgabedatum = document.getElementById('abgabedatum').value;
 
     if (editMode) {
@@ -134,7 +135,7 @@
         <td>${name}</td>
         <td>${autor}</td>
         <td>${genre}</td>
-        <td>${verfügbarkeit}</td>
+        <td>${verfuegbarkeit}</td>
         <td>${abgabedatum}</td>
         <td class="action-buttons">
           <button class="edit-btn" onclick="editBook(${currentEditIndex})">Bearbeiten</button>
@@ -145,13 +146,13 @@
     } else {
       const newRow = document.createElement('tr');
       const newIndex = bookTableBody.rows.length;
-      newRow.setAttribute('data-index', newIndex);
+      newRow.setAttribute('data-index', newIndex.toString());
       newRow.innerHTML = `
         <td>${isbn}</td>
         <td>${name}</td>
         <td>${autor}</td>
         <td>${genre}</td>
-        <td>${verfügbarkeit}</td>
+        <td>${verfuegbarkeit}</td>
         <td>${abgabedatum}</td>
         <td class="action-buttons">
           <button class="edit-btn" onclick="editBook(${newIndex})">Bearbeiten</button>

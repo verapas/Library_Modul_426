@@ -8,6 +8,7 @@ public class BookDetailDto {
     private int id;
     private String title;
     private String author;
+    private String genre;
     private String isbn;
     private boolean available;
     private List<LoanDto> loans;  // Liste an wen schon verleiht etc.

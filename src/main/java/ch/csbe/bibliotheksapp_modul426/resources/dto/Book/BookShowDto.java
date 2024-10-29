@@ -7,6 +7,7 @@ public class BookShowDto {
     private int id;
     private String title;
     private String author;
+    private String genre;
     private String isbn;
     private boolean available;
 }

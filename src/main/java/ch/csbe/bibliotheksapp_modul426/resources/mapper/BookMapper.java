@@ -28,8 +28,9 @@ public interface BookMapper {
     // Aktualisiert eine bestehende Book-Entity mit Daten aus BookUpdateDto
     void updateBookEntity(BookUpdateDto bookUpdateDto, @MappingTarget Book book);
 
-    // Map Book Entity to BookDetailDto, inklusive eingebetteter LoanDtos
+    // Map Book Entity to BookDetailDto, inklusive eingebetteter LoanDtos und Genre
     @Mapping(source = "loans", target = "loans")
+    @Mapping(source = "genre", target = "genre")
     BookDetailDto toBookDetailDto(Book book);
 
     // Mapping von Loan zu LoanDto für eingebettete Loan-Daten in BookDetailDto

@@ -40,7 +40,7 @@ nav ul li a {
 /* Main Content */
 main {
     padding: 20px;
-    flex: 1; /* Damit der Inhalt den verfügbaren Platz zwischen Header und Footer nutzt */
+    flex: 1;
 }
 
 /* Anmeldeformular */
@@ -80,11 +80,11 @@ h2 {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
-    box-sizing: border-box; /* Wichtig für konsistente Größe */
+    box-sizing: border-box;
 }
 
 button {
-    width: 100%;
+
     padding: 12px;
     background-color: #35424a;
     color: white;
@@ -123,6 +123,7 @@ button[type="button"]:hover {
     max-width: 400px;
     margin: 0 auto;
 }
+
 /* Profilformular */
 #profile {
     margin-top: 20px;
@@ -149,4 +150,142 @@ footer {
     left: 0;
     width: 100%;
     box-sizing: border-box;
+}
+
+/* Stile für die Tabelle und andere Elemente der Bücherübersicht */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Button-Container und Buttons */
+.button-container {
+    position: absolute;
+    bottom: 60px;
+    left: 5px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.button-container button {
+    padding: 6px 9px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100px;
+    text-align: center;
+}
+
+.button-container button:hover {
+    background-color: #34495e;
+}
+
+/* Formular-Styling */
+.form-container {
+    display: none;
+    margin-bottom: 20px;
+}
+
+.form-container input {
+    margin: 5px;
+    padding: 5px;
+}
+
+/* Sortier- und Filterbereich */
+.sort-filter-container {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+}
+
+/* Burgermenue */
+.unsichtbar {
+    background-color: darkgrey;
+    text-decoration: none;
+    color: white;
+    width: auto;
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    z-index: 1000;
+}
+.unsichtbar a {
+    color: white;
+    text-decoration: none;
+}
+.unsichtbar.active {
+    display: flex;
+    color: white;
+}
+.unsichtbar.active a {
+    color: white;
+}
+.burger {
+    height: 40px;
+    width: 30px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    cursor: pointer;
+}
+
+.burger span {
+    height: 4px;
+    width: 100%;
+    background-color: #FFFFFF;
+    border-radius: 25px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: .3s ease;
+}
+
+
+.burger span:nth-child(1) {
+    top: 25%;
+}
+
+.burger span:nth-child(3) {
+    top: 75%;
+}
+
+.burger.active span:nth-child(1) {
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.burger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.burger.active span:nth-child(3) {
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
 }

@@ -33,7 +33,28 @@ public class UserService {
                 .orElse(null);  // Gibt null zurück, wenn der Benutzer nicht gefunden wird
     }
 
-    // Methode zum Erstellen eines neuen Benutzers
+    // Benutzer registrieren (prüft auf doppelte E-Mail)
+    public UserShowDto registerUser(UserCreateDto userCreateDto) {
+        if (userRepository.findByEmail(userCreateDto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("E-Mail existiert bereits.");
+        }
+        User user = userMapper.toUserEntity(userCreateDto);
+        User savedUser = userRepository.save(user);
+        return userMapper.toUserShowDto(savedUser);
+    }
+
+    // Benutzer anmelden (optional)
+    public UserShowDto authenticateUser(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+
+        if (!user.getPassword().equals(password)) {
+            throw new RuntimeException("Ungültige Anmeldedaten");
+        }
+        return userMapper.toUserShowDto(user);
+    }
+
+    // Benutzer speichern
     public UserShowDto save(UserCreateDto userCreateDto) {
         User user = userMapper.toUserEntity(userCreateDto);
         User savedUser = userRepository.save(user);
@@ -53,4 +74,6 @@ public class UserService {
     public void delete(int id) {
         userRepository.deleteById(id);
     }
+
+
 }

@@ -37,8 +37,8 @@
       <div>
         <label for="sortieren">Sortieren nach:</label>
         <select id="sortieren">
-          <option value="name">Name (A-Z)</option>
-          <option value="name-reversed">Name (Z-A)</option>
+          <option value="title">Name (A-Z)</option>
+          <option value="title-reversed">Name (Z-A)</option>
         </select>
         <button onclick="sortBooks()">Sortieren</button>
       </div>
@@ -48,10 +48,10 @@
         <label for="filter-kriterium">Filtern nach:</label>
         <select id="filter-kriterium">
           <option value="isbn">ISBN</option>
-          <option value="name">Name</option>
-          <option value="autor">Autor</option>
+          <option value="title">Name</option>
+          <option value="author">Autor</option>
           <option value="genre">Genre</option>
-          <option value="verfuegbarkeit">Verfügbarkeit</option>
+          <option value="available">Verfügbarkeit</option>
         </select>
         <label for="filter-wert">Wert:</label>
         <input type="text" id="filter-wert" placeholder="Filterwert eingeben">
@@ -64,14 +64,14 @@
       <input type="hidden" id="edit-index" value="">
       <label for="isbn">ISBN:</label>
       <input type="text" id="isbn" required>
-      <label for="name">Name:</label>
-      <input type="text" id="name" required>
-      <label for="autor">Autor:</label>
-      <input type="text" id="autor" required>
+      <label for="title">Name:</label>
+      <input type="text" id="title" required>
+      <label for="author">Autor:</label>
+      <input type="text" id="author" required>
       <label for="genre">Genre:</label>
       <input type="text" id="genre" required>
-      <label for="verfuegbarkeit">Verfügbarkeit:</label>
-      <input type="text" id="verfuegbarkeit" required>
+      <label for="available">Verfügbarkeit:</label>
+      <input type="text" id="available" required>
       <button id="submit-btn">Buch hinzufügen</button>
     </div>
 
@@ -99,61 +99,30 @@
 </footer>
 
 <script>
-  let editMode = false;
-  let currentEditIndex = null;
+  let currentEditIndex = undefined;
 
   const hinzufuegenBtn = document.getElementById('hinzufuegen-btn');
-  const bearbeitenBtn = document.getElementById('bearbeiten-btn');
   const formContainer = document.getElementById('form-container');
   const submitBtn = document.getElementById('submit-btn');
   const bookTableBody = document.getElementById('book-table-body');
 
   hinzufuegenBtn.addEventListener('click', () => {
     formContainer.style.display = formContainer.style.display !== 'block' ? 'block' : 'none';
-    resetForm();
   });
 
   submitBtn.addEventListener('click', (event) => {
     event.preventDefault();
 
-    const isbn = document.getElementById('isbn').value;
-    const name = document.getElementById('name').value;
-    const autor = document.getElementById('autor').value;
-    const genre = document.getElementById('genre').value;
-    const verfuegbarkeit = document.getElementById('verfuegbarkeit').value;
-
-    if (editMode) {
-      const row = document.querySelector(`#book-table-body tr[data-index="${currentEditIndex}"]`);
-      row.innerHTML = `
-        <td>${isbn}</td>
-        <td>${name}</td>
-        <td>${autor}</td>
-        <td>${genre}</td>
-        <td>${verfuegbarkeit}</td>
-        <td class="action-buttons">
-          <button class="edit-btn" onclick="editBook(${currentEditIndex})">Bearbeiten</button>
-          <button class="delete-btn" onclick="deleteBook(${currentEditIndex})">Löschen</button>
-        </td>
-      `;
-      resetForm();
-    } else {
-      const newRow = document.createElement('tr');
-      const newIndex = bookTableBody.rows.length;
-      newRow.setAttribute('data-index', newIndex.toString());
-      newRow.innerHTML = `
-        <td>${isbn}</td>
-        <td>${name}</td>
-        <td>${autor}</td>
-        <td>${genre}</td>
-        <td>${verfuegbarkeit}</td>
-        <td class="action-buttons">
-          <button class="edit-btn" onclick="editBook(${newIndex})">Bearbeiten</button>
-          <button class="delete-btn" onclick="deleteBook(${newIndex})">Löschen</button>
-        </td>
-      `;
-      bookTableBody.appendChild(newRow);
-      resetForm();
-    }
+    const bookData = {
+      id: currentEditIndex,
+      isbn: document.getElementById('isbn').value,
+      title: document.getElementById('title').value,
+      author: document.getElementById('author').value,
+      genre: document.getElementById('genre').value,
+      available: document.getElementById('available').value
+    };
+    saveBook(bookData)
+    resetForm();
   });
 
   function sortBooks() {
@@ -168,7 +137,7 @@
       return aText.localeCompare(bText);
     });
 
-    if (sortierenNach === 'name-reversed') {
+    if (sortierenNach === 'title-reversed') {
       rows.reverse();
     }
 
@@ -178,7 +147,7 @@
   function filterBooks() {
     const kriterium = document.getElementById('filter-kriterium').value;
     const filterWert = document.getElementById('filter-wert').value.toLowerCase();
-    const columnIndex = { isbn: 0, name: 1, autor: 2, genre: 3, verfügbarkeit: 4, abgabedatum: 5 }[kriterium];
+    const columnIndex = {isbn: 0, title: 1, author: 2, genre: 3, available: 4}[kriterium];
 
     Array.from(bookTableBody.rows).forEach(row => {
       const cellValue = row.cells[columnIndex].innerText.toLowerCase();

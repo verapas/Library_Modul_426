@@ -155,9 +155,6 @@
     });
   }
 
-  function editBook(index) { /*...*/ }
-  function deleteBook(index) { /*...*/ }
-  function resetForm() { /*...*/ }
   // Initialisierung der Tabelle beim Laden
   async function initializeBooks() {
     try {
@@ -203,6 +200,49 @@
     }
   }
 
+  async function editBook(bookString) {
+    // book kommt als JSON-String, daher muss es hier geparst werden
+    const book = JSON.parse(atob(bookString))
+    currentEditIndex = book.id;
+
+    // Formularfelder mit den Buchdaten füllen
+    document.getElementById('isbn').value = book.isbn;
+    document.getElementById('title').value = book.title;
+    document.getElementById('author').value = book.author;
+    document.getElementById('genre').value = book.genre;
+    document.getElementById('available').value = book.available;
+
+    // Formular anzeigen und Submit-Button Text ändern
+    formContainer.style.display = 'block';
+    submitBtn.textContent = 'Buch aktualisieren';
+  }
+
+  async function deleteBook(id) {
+    try {
+      await fetchAPI(`/books/${id}`, 'DELETE');
+      await initializeBooks();
+    } catch (error) {
+      console.error('Fehler beim Löschen des Buchs:', error);
+    }
+  }
+
+  function resetForm() {
+    // Formularfelder zurücksetzen
+    document.getElementById('isbn').value = '';
+    document.getElementById('title').value = '';
+    document.getElementById('author').value = '';
+    document.getElementById('genre').value = '';
+    document.getElementById('available').value = '';
+
+    // Formular ausblenden
+    formContainer.style.display = 'none';
+
+    // Bearbeitungsmodus zurücksetzen
+    currentEditIndex = undefined;
+
+    // Submit-Button Text zurücksetzen
+    submitBtn.textContent = 'Buch hinzufügen';
+  }
 
   async function fetchAPI(endpoint, method = 'GET', data = undefined) {
     const options = {

@@ -4,6 +4,7 @@ import ch.csbe.bibliotheksapp_modul426.resources.dto.Book.BookCreateDto;
 import ch.csbe.bibliotheksapp_modul426.resources.dto.Book.BookDetailDto;
 import ch.csbe.bibliotheksapp_modul426.resources.dto.Book.BookShowDto;
 import ch.csbe.bibliotheksapp_modul426.resources.dto.Book.BookUpdateDto;
+import ch.csbe.bibliotheksapp_modul426.resources.dto.Loan.LoanShowDto;
 import ch.csbe.bibliotheksapp_modul426.resources.serviceLayer.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -82,5 +83,16 @@ public class BookController {
         }
         bookService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Gibt ein Buch zurück, basierend auf der Buch-ID.
+     * Methode: PUT
+     * URL: http://localhost:8080/books/{bookId}/return
+     */
+    @PutMapping("/{bookId}/return")
+    public ResponseEntity<LoanShowDto> returnBook(@PathVariable Integer bookId) {
+        LoanShowDto updatedLoan = bookService.returnBookByBookId(bookId);
+        return ResponseEntity.ok(updatedLoan);
     }
 }

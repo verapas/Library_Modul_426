@@ -6,6 +6,7 @@ import lombok.Data;
 public class BookCreateDto {
     private String title;
     private String author;
+    private String genre;
     private String isbn;
     // available sollte standartmässig auf True gesetzt werden (serviceLayer)
 }

@@ -139,4 +139,24 @@ public class BookController {
         LoanShowDto updatedLoan = bookService.returnBookByBookId(bookId);
         return ResponseEntity.ok(updatedLoan);
     }
+
+    /**
+     * Gibt eine Liste von Büchern basierend auf dem angegebenen Genre zurück.
+     * Methode: GET
+     * URL: http://localhost:8080/books/by-genre?genre={genre}
+     */
+    @Operation(summary = "Gibt eine Liste der Bücher nach Genre zurück", description = "Findet alle Bücher, die zum angegebenen Genre gehören.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Erfolgreiche Antwort, Bücher wurden gefunden"),
+            @ApiResponse(responseCode = "404", description = "Kein Buch für das angegebene Genre gefunden"),
+            @ApiResponse(responseCode = "400", description = "Ungültige Anfrageparameter")
+    })
+    @GetMapping("/by-genre")
+    public ResponseEntity<List<BookShowDto>> getBooksByGenre(
+            @Parameter(description = "Das Genre der Bücher, die abgerufen werden sollen", example = "Roman")
+            @RequestParam String genre) {
+
+        List<BookShowDto> books = bookService.findByGenre(genre);
+        return ResponseEntity.ok(books);
+    }
 }

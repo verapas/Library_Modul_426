@@ -88,4 +88,11 @@ public class BookService {
         Loan updatedLoan = loanRepository.save(loan);
         return loanMapper.toLoanShowDto(updatedLoan);
     }
+
+    // Methode, um alle Bücher eines bestimmten Genres zu finden
+    public List<BookShowDto> findByGenre(String genre) {
+        return bookRepository.findByGenre(genre).stream()
+                .map(bookMapper::toBookShowDto)
+                .collect(Collectors.toList());
+    }
 }

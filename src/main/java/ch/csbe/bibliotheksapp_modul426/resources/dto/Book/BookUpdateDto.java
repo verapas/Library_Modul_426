@@ -6,6 +6,7 @@ import lombok.Data;
 public class BookUpdateDto {
     private String title;
     private String author;
+    private String genre;
     private String isbn;
     private boolean available;
 }

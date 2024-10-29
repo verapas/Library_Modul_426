@@ -158,7 +158,70 @@
   function editBook(index) { /*...*/ }
   function deleteBook(index) { /*...*/ }
   function resetForm() { /*...*/ }
+  // Initialisierung der Tabelle beim Laden
+  async function initializeBooks() {
+    try {
+      const books = await fetchAPI('/books');
+      bookTableBody.innerHTML = '';
+      books.forEach((book) => {
+        const row = document.createElement('tr');
+        // row.setAttribute('data-index', book.id);
+        row.innerHTML = `
+        <td>${book.isbn}</td>
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.genre}</td>
+        <td>${book.available}</td>
+        <td class="action-buttons">
+          <button class="edit-btn" onclick="editBook('${btoa(JSON.stringify(book))}')">Bearbeiten</button>
+          <button class="delete-btn" onclick="deleteBook(${book.id})">Löschen</button>
+        </td>
+      `;
+        bookTableBody.appendChild(row);
+      });
+    } catch (error) {
+      console.error('Fehler beim Laden der Bücher:', error);
+    }
+  }
 
+  async function saveBook(bookData) {
+    const method = bookData.id === undefined ? `POST` : `PUT`;
+    const url = bookData.id === undefined ? '/books' : `/books/${bookData.id}`;
+
+    try {
+      await fetchAPI(url, method, {
+        isbn: bookData.isbn,
+        title: bookData.title,
+        author: bookData.author,
+        genre: bookData.genre,
+        available: bookData.available
+      });
+      await initializeBooks(); // Tabelle neu laden
+      resetForm();
+    } catch (error) {
+      console.error('Fehler beim Speichern des Buchs:', error);
+    }
+  }
+
+
+  async function fetchAPI(endpoint, method = 'GET', data = undefined) {
+    const options = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(endpoint, options);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return method === 'DELETE' ? undefined : await response.json();
+  }
 
   // Hamburger Menü-Logik
   const burger = document.querySelector(".burger");
@@ -169,6 +232,8 @@
     offScreenMenu.classList.toggle("active"); // Aktiviert oder deaktiviert die 'active'-Klasse beim Menü
   });
 
+  // Bücher laden
+  initializeBooks()
 </script>
 
 </body>

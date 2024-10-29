@@ -39,7 +39,7 @@
         <label for="sortieren">Sortieren nach:</label>
         <select id="sortieren">
           <option value="name">Name (A-Z)</option>
-          <option value="abgabedatum">Abgabedatum</option>
+          <option value="name-reversed">Name (Z-A)</option>
         </select>
         <button onclick="sortBooks()">Sortieren</button>
       </div>
@@ -53,7 +53,6 @@
           <option value="autor">Autor</option>
           <option value="genre">Genre</option>
           <option value="verfuegbarkeit">Verfügbarkeit</option>
-          <option value="abgabedatum">Abgabedatum</option>
         </select>
         <label for="filter-wert">Wert:</label>
         <input type="text" id="filter-wert" placeholder="Filterwert eingeben">
@@ -74,8 +73,6 @@
       <input type="text" id="genre" required>
       <label for="verfuegbarkeit">Verfügbarkeit:</label>
       <input type="text" id="verfuegbarkeit" required>
-      <label for="abgabedatum">Abgabedatum:</label>
-      <input type="text" id="abgabedatum" placeholder="YYYY-MM-DD" required>
       <button id="submit-btn">Buch hinzufügen</button>
     </div>
 
@@ -88,7 +85,6 @@
         <th>Autor</th>
         <th>Genre</th>
         <th>Verfügbarkeit</th>
-        <th>Abgabedatum</th>
         <th>Aktionen</th>
       </tr>
       </thead>
@@ -126,7 +122,6 @@
     const autor = document.getElementById('autor').value;
     const genre = document.getElementById('genre').value;
     const verfuegbarkeit = document.getElementById('verfuegbarkeit').value;
-    const abgabedatum = document.getElementById('abgabedatum').value;
 
     if (editMode) {
       const row = document.querySelector(`#book-table-body tr[data-index="${currentEditIndex}"]`);
@@ -136,7 +131,6 @@
         <td>${autor}</td>
         <td>${genre}</td>
         <td>${verfuegbarkeit}</td>
-        <td>${abgabedatum}</td>
         <td class="action-buttons">
           <button class="edit-btn" onclick="editBook(${currentEditIndex})">Bearbeiten</button>
           <button class="delete-btn" onclick="deleteBook(${currentEditIndex})">Löschen</button>
@@ -153,7 +147,6 @@
         <td>${autor}</td>
         <td>${genre}</td>
         <td>${verfuegbarkeit}</td>
-        <td>${abgabedatum}</td>
         <td class="action-buttons">
           <button class="edit-btn" onclick="editBook(${newIndex})">Bearbeiten</button>
           <button class="delete-btn" onclick="deleteBook(${newIndex})">Löschen</button>
@@ -169,11 +162,16 @@
     const rows = Array.from(bookTableBody.rows);
 
     rows.sort((a, b) => {
-      const aText = a.cells[sortierenNach === 'name' ? 1 : 5].innerText.toLowerCase();
-      const bText = b.cells[sortierenNach === 'name' ? 1 : 5].innerText.toLowerCase();
+      // wir sortieren immer nach Name
+      const aText = a.cells[1].innerText.toLowerCase();
+      const bText = b.cells[1].innerText.toLowerCase();
 
       return aText.localeCompare(bText);
     });
+
+    if (sortierenNach === 'name-reversed') {
+      rows.reverse();
+    }
 
     rows.forEach(row => bookTableBody.appendChild(row));
   }

@@ -203,7 +203,8 @@ tr:nth-child(even) {
     margin-bottom: 20px;
 }
 
-.form-container input {
+.form-container input,
+.form-container select {
     margin: 5px;
     padding: 5px;
 }

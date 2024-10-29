@@ -28,8 +28,7 @@
   <section id="books">
     <!-- Buttons zum Bearbeiten und Hinzufügen -->
     <div class="button-container">
-      <button id="hinzufügen-btn">Hinzufügen</button>
-      <button id="bearbeiten-btn">Bearbeiten</button>
+      <button id="hinzufuegen-btn">Hinzufügen</button>
     </div>
 
     <!-- Sortier- und Filterbereich -->
@@ -38,8 +37,8 @@
       <div>
         <label for="sortieren">Sortieren nach:</label>
         <select id="sortieren">
-          <option value="name">Name (A-Z)</option>
-          <option value="abgabedatum">Abgabedatum</option>
+          <option value="title">Name (A-Z)</option>
+          <option value="title-reversed">Name (Z-A)</option>
         </select>
         <button onclick="sortBooks()">Sortieren</button>
       </div>
@@ -49,12 +48,12 @@
         <label for="filter-kriterium">Filtern nach:</label>
         <select id="filter-kriterium">
           <option value="isbn">ISBN</option>
-          <option value="name">Name</option>
-          <option value="autor">Autor</option>
+          <option value="title">Name</option>
+          <option value="author">Autor</option>
           <option value="genre">Genre</option>
-          <option value="verfügbarkeit">Verfügbarkeit</option>
-          <option value="abgabedatum">Abgabedatum</option>
+          <option value="available">Verfügbar</option>
         </select>
+        <label for="filter-wert">Wert:</label>
         <input type="text" id="filter-wert" placeholder="Filterwert eingeben">
         <button onclick="filterBooks()">Filtern</button>
       </div>
@@ -65,29 +64,29 @@
       <input type="hidden" id="edit-index" value="">
       <label for="isbn">ISBN:</label>
       <input type="text" id="isbn" required>
-      <label for="name">Name:</label>
-      <input type="text" id="name" required>
-      <label for="autor">Autor:</label>
-      <input type="text" id="autor" required>
+      <label for="title">Name:</label>
+      <input type="text" id="title" required>
+      <label for="author">Autor:</label>
+      <input type="text" id="author" required>
       <label for="genre">Genre:</label>
       <input type="text" id="genre" required>
-      <label for="verfügbarkeit">Verfügbarkeit:</label>
-      <input type="text" id="verfügbarkeit" required>
-      <label for="abgabedatum">Abgabedatum:</label>
-      <input type="text" id="abgabedatum" placeholder="YYYY-MM-DD" required>
+      <label for="available">Verfügbar:</label>
+      <select id="available" required disabled>
+        <option value="true" selected>Ja</option>
+        <option value="false">Nein</option>
+      </select>
       <button id="submit-btn">Buch hinzufügen</button>
     </div>
 
     <!-- Tabelle zur Anzeige der Bücher -->
-    <table border="1" cellspacing="0" cellpadding="10">
+    <table>
       <thead>
       <tr>
         <th>ISBN</th>
         <th>Name</th>
         <th>Autor</th>
         <th>Genre</th>
-        <th>Verfügbarkeit</th>
-        <th>Abgabedatum</th>
+        <th>Verfügbar</th>
         <th>Aktionen</th>
       </tr>
       </thead>
@@ -103,64 +102,30 @@
 </footer>
 
 <script>
-  let editMode = false;
-  let currentEditIndex = null;
+  let currentEditIndex = undefined;
 
-  const hinzufügenBtn = document.getElementById('hinzufügen-btn');
-  const bearbeitenBtn = document.getElementById('bearbeiten-btn');
+  const hinzufuegenBtn = document.getElementById('hinzufuegen-btn');
   const formContainer = document.getElementById('form-container');
   const submitBtn = document.getElementById('submit-btn');
   const bookTableBody = document.getElementById('book-table-body');
 
-  hinzufügenBtn.addEventListener('click', () => {
-    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-    resetForm();
+  hinzufuegenBtn.addEventListener('click', () => {
+    formContainer.style.display = formContainer.style.display !== 'block' ? 'block' : 'none';
   });
 
   submitBtn.addEventListener('click', (event) => {
     event.preventDefault();
 
-    const isbn = document.getElementById('isbn').value;
-    const name = document.getElementById('name').value;
-    const autor = document.getElementById('autor').value;
-    const genre = document.getElementById('genre').value;
-    const verfügbarkeit = document.getElementById('verfügbarkeit').value;
-    const abgabedatum = document.getElementById('abgabedatum').value;
-
-    if (editMode) {
-      const row = document.querySelector(`#book-table-body tr[data-index="${currentEditIndex}"]`);
-      row.innerHTML = `
-        <td>${isbn}</td>
-        <td>${name}</td>
-        <td>${autor}</td>
-        <td>${genre}</td>
-        <td>${verfügbarkeit}</td>
-        <td>${abgabedatum}</td>
-        <td class="action-buttons">
-          <button class="edit-btn" onclick="editBook(${currentEditIndex})">Bearbeiten</button>
-          <button class="delete-btn" onclick="deleteBook(${currentEditIndex})">Löschen</button>
-        </td>
-      `;
-      resetForm();
-    } else {
-      const newRow = document.createElement('tr');
-      const newIndex = bookTableBody.rows.length;
-      newRow.setAttribute('data-index', newIndex);
-      newRow.innerHTML = `
-        <td>${isbn}</td>
-        <td>${name}</td>
-        <td>${autor}</td>
-        <td>${genre}</td>
-        <td>${verfügbarkeit}</td>
-        <td>${abgabedatum}</td>
-        <td class="action-buttons">
-          <button class="edit-btn" onclick="editBook(${newIndex})">Bearbeiten</button>
-          <button class="delete-btn" onclick="deleteBook(${newIndex})">Löschen</button>
-        </td>
-      `;
-      bookTableBody.appendChild(newRow);
-      resetForm();
-    }
+    const bookData = {
+      id: currentEditIndex,
+      isbn: document.getElementById('isbn').value,
+      title: document.getElementById('title').value,
+      author: document.getElementById('author').value,
+      genre: document.getElementById('genre').value,
+      available: document.getElementById('available').value === 'true'
+    };
+    saveBook(bookData)
+    resetForm();
   });
 
   function sortBooks() {
@@ -168,11 +133,16 @@
     const rows = Array.from(bookTableBody.rows);
 
     rows.sort((a, b) => {
-      const aText = a.cells[sortierenNach === 'name' ? 1 : 5].innerText.toLowerCase();
-      const bText = b.cells[sortierenNach === 'name' ? 1 : 5].innerText.toLowerCase();
+      // wir sortieren immer nach Name
+      const aText = a.cells[1].innerText.toLowerCase();
+      const bText = b.cells[1].innerText.toLowerCase();
 
       return aText.localeCompare(bText);
     });
+
+    if (sortierenNach === 'title-reversed') {
+      rows.reverse();
+    }
 
     rows.forEach(row => bookTableBody.appendChild(row));
   }
@@ -180,7 +150,7 @@
   function filterBooks() {
     const kriterium = document.getElementById('filter-kriterium').value;
     const filterWert = document.getElementById('filter-wert').value.toLowerCase();
-    const columnIndex = { isbn: 0, name: 1, autor: 2, genre: 3, verfügbarkeit: 4, abgabedatum: 5 }[kriterium];
+    const columnIndex = {isbn: 0, title: 1, author: 2, genre: 3, available: 4}[kriterium];
 
     Array.from(bookTableBody.rows).forEach(row => {
       const cellValue = row.cells[columnIndex].innerText.toLowerCase();
@@ -188,10 +158,115 @@
     });
   }
 
-  function editBook(index) { /*...*/ }
-  function deleteBook(index) { /*...*/ }
-  function resetForm() { /*...*/ }
+  // Initialisierung der Tabelle beim Laden
+  async function initializeBooks() {
+    try {
+      const books = await fetchAPI('/books');
+      bookTableBody.innerHTML = '';
+      books.forEach((book) => {
+        const row = document.createElement('tr');
+        // row.setAttribute('data-index', book.id);
+        row.innerHTML = `
+        <td>${book.isbn}</td>
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.genre}</td>
+        <td>${book.available}</td>
+        <td class="action-buttons">
+          <button class="edit-btn" onclick="editBook('${btoa(JSON.stringify(book))}')">Bearbeiten</button>
+          <button class="delete-btn" onclick="deleteBook(${book.id})">Löschen</button>
+        </td>
+      `;
+        bookTableBody.appendChild(row);
+      });
+    } catch (error) {
+      console.error('Fehler beim Laden der Bücher:', error);
+    }
+  }
 
+  async function saveBook(bookData) {
+    const method = bookData.id === undefined ? `POST` : `PUT`;
+    const url = bookData.id === undefined ? '/books' : `/books/${bookData.id}`;
+
+    try {
+      await fetchAPI(url, method, {
+        isbn: bookData.isbn,
+        title: bookData.title,
+        author: bookData.author,
+        genre: bookData.genre,
+        available: bookData.available
+      });
+      await initializeBooks(); // Tabelle neu laden
+      resetForm();
+    } catch (error) {
+      console.error('Fehler beim Speichern des Buchs:', error);
+    }
+  }
+
+  async function editBook(bookString) {
+    // book kommt als JSON-String, daher muss es hier geparst werden
+    const book = JSON.parse(atob(bookString))
+    currentEditIndex = book.id;
+
+    // Formularfelder mit den Buchdaten füllen
+    document.getElementById('isbn').value = book.isbn;
+    document.getElementById('title').value = book.title;
+    document.getElementById('author').value = book.author;
+    document.getElementById('genre').value = book.genre;
+    document.getElementById('available').value = book.available.toString();
+    document.getElementById('available').disabled = false;
+
+    // Formular anzeigen und Submit-Button Text ändern
+    formContainer.style.display = 'block';
+    submitBtn.textContent = 'Buch aktualisieren';
+  }
+
+  async function deleteBook(id) {
+    try {
+      await fetchAPI(`/books/${id}`, 'DELETE');
+      await initializeBooks();
+    } catch (error) {
+      console.error('Fehler beim Löschen des Buchs:', error);
+    }
+  }
+
+  function resetForm() {
+    // Formularfelder zurücksetzen
+    document.getElementById('isbn').value = '';
+    document.getElementById('title').value = '';
+    document.getElementById('author').value = '';
+    document.getElementById('genre').value = '';
+    document.getElementById('available').value = 'true';
+    document.getElementById('available').disabled = true;
+
+    // Formular ausblenden
+    formContainer.style.display = 'none';
+
+    // Bearbeitungsmodus zurücksetzen
+    currentEditIndex = undefined;
+
+    // Submit-Button Text zurücksetzen
+    submitBtn.textContent = 'Buch hinzufügen';
+  }
+
+  async function fetchAPI(endpoint, method = 'GET', data = undefined) {
+    const options = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(endpoint, options);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return method === 'DELETE' ? undefined : await response.json();
+  }
 
   // Hamburger Menü-Logik
   const burger = document.querySelector(".burger");
@@ -202,6 +277,8 @@
     offScreenMenu.classList.toggle("active"); // Aktiviert oder deaktiviert die 'active'-Klasse beim Menü
   });
 
+  // Bücher laden
+  initializeBooks()
 </script>
 
 </body>
